@@ -17,4 +17,4 @@ cd simple-fusion-visualization
 python -m http.server 8000
 ```
 
-then, open http://localhost:8000/index.html?data=<path to json file> .
+then, open http://localhost:8000/index.html?data=&lt;path to json file&gt; .
