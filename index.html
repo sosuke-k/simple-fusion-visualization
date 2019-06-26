@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Simple Fusion Visualization using D3(v5)</title>
+  <!-- Based on https://wizardace.com/d3-tree/ -->
+  <style>
+  .link {
+    fill: none;
+    stroke: #555;
+    stroke-opacity: 0.4;
+    stroke-width: 1.5px;
+  }
+  </style>
+</head>
+
+<body>
+  <svg width="1200" height="800"></svg>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script>
+  var width = document.querySelector("svg").clientWidth;
+  var height = document.querySelector("svg").clientHeight;
+
+  // d3.json function used
+  // var data = {
+  //   "name": "F",
+  //   "documents": [
+  //     { "doc_id": "1", "score": "202.0", "rel": 3},
+  //     { "doc_id": "3", "score": "138.0", "rel": 0},
+  //     { "doc_id": "5", "score": "67.0", "rel": 1}
+  //   ],
+  //   "children": [
+  //     {
+  //       "name": "S1",
+  //       "documents": [
+  //         { "doc_id": "1", "score": "63.0", "rel": 3},
+  //         { "doc_id": "2", "score": "40.0", "rel": 0},
+  //         { "doc_id": "3", "score": "39.0", "rel": 0}
+  //       ]
+  //     },
+  //     {
+  //       "name": "S2",
+  //       "documents": [
+  //         { "doc_id": "5", "score": "67.0", "rel": 1},
+  //         { "doc_id": "1", "score": "38.0", "rel": 3},
+  //         { "doc_id": "3", "score": "30.0", "rel": 0}
+  //       ]
+  //     }
+  //   ]
+  // }
+
+
+  // Refering https://github.com/d3/d3-hierarchy/blob/master/src/hierarchy/index.js
+
+  d3.hierarchy.prototype.each_document = function(callback) {
+    var descendants = this.descendants();
+    var i, j, m, n;
+    for (i = 0, n = descendants.length; i < n; ++i) {
+      documents = descendants[i].data.documents;
+      for (j = 0, m = documents.length; j < m; j++) {
+        callback(descendants[i], j + 1, documents[j]);
+      }
+    }
+    return this;
+  }
+
+  d3.hierarchy.prototype.documents = function() {
+    var nodes = [];
+    this.each_document(function(parent, rank, document) {
+      // document.parent = parent;
+      // document.rank = rank;
+      var doc_interval = 20;
+      document.x = parent.x;
+      document.y = parent.y + rank * doc_interval;
+      nodes.push(document);
+    });
+    return nodes;
+  }
+
+  d3.hierarchy.prototype.document_links = function() {
+    var root = this;
+    var root_doc_ids = _.pluck(root.data.documents, "doc_id");
+    var links = [];
+    root.each_document(function(parent, rank, document) {
+      if (root != parent) {
+        if (root_doc_ids.includes(document.doc_id)) {
+          links.push({
+            "source": document,
+            "target": _.findWhere(root.data.documents, {"doc_id": document.doc_id})
+          });
+        }
+      }
+    });
+    return links;
+  }
+
+  async function draw() {
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var jsonPath = urlParams.get("data");
+    console.log("Loading " + jsonPath)
+
+    if (jsonPath == null) return;
+
+    // It needs a browse that supports await in async function
+    const data = await d3.json(jsonPath);
+    console.log(data);
+
+    g = d3.select("svg").append("g").attr("transform", "translate(80,50)");
+
+    var tree = d3.tree()
+      .size([width - 400, height - 700])
+    root = d3.hierarchy(data);
+    tree(root);
+
+    var tops = g.selectAll(".top-node")
+      .data(root.descendants())
+      .enter()
+      .append("g")
+      .attr("class", "top-node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+
+    tops.append("text")
+      .attr("dy", 3)
+      .attr("x", function(d) { return 12; })
+      .style("text-anchor", function(d) { return "start"; })
+      .attr("font-size", "150%")
+      .text(function(d) { return d.data.name; });
+
+    root.documents(); // before appending path
+
+    var link2 = g.selectAll(".link")
+      .data(root.document_links())
+      .enter()
+      .append("path")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var margin = d.source.x < d.target.x ? 100 : -100;
+        return "M" + d.source.x + "," + d.source.y +
+          "C" + (d.source.x + margin) + "," + d.source.y +
+          " " + (d.target.x - margin) + "," + d.target.y +
+          " " + d.target.x + "," + d.target.y;
+      });
+
+    var documents = g.selectAll(".node")
+      .data(root.documents())
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+
+    documents.append("circle")
+      .attr("r", 8)
+      .attr("fill", function(d) {
+        if (d.rel == 3) return "#F00";
+        if (d.rel == 1) return "#900";
+        return "#999";
+      });
+
+    documents.append("text")
+      .attr("dy", 3)
+      .attr("x", function(d) { return 12; })
+      .style("text-anchor", function(d) { return "start"; })
+      .attr("font-size", "100%")
+      .text(function(d) { return d.doc_id + ": " + d.score; });
+
+  }
+
+  draw();
+
+  </script>
+</body>
+
+</html>

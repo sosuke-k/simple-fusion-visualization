@@ -1,0 +1,26 @@
+{
+  "name": "F",
+  "documents": [
+    { "doc_id": "1", "score": "202.0", "rel": 3},
+    { "doc_id": "3", "score": "138.0", "rel": 0},
+    { "doc_id": "5", "score": "67.0", "rel": 1}
+  ],
+  "children": [
+    {
+      "name": "S1",
+      "documents": [
+        { "doc_id": "1", "score": "63.0", "rel": 3},
+        { "doc_id": "2", "score": "40.0", "rel": 0},
+        { "doc_id": "3", "score": "39.0", "rel": 0}
+      ]
+    },
+    {
+      "name": "S2",
+      "documents": [
+        { "doc_id": "5", "score": "67.0", "rel": 1},
+        { "doc_id": "1", "score": "38.0", "rel": 3},
+        { "doc_id": "3", "score": "30.0", "rel": 0}
+      ]
+    }
+  ]
+}
