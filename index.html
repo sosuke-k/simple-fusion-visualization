@@ -81,15 +81,27 @@
 
   d3.hierarchy.prototype.document_links = function() {
     var root = this;
-    var root_doc_ids = _.pluck(root.data.documents, "doc_id");
+    // var root_doc_ids = _.pluck(root.data.documents, "doc_id");
     var links = [];
     root.each_document(function(parent, rank, document) {
       if (root != parent) {
-        if (root_doc_ids.includes(document.doc_id)) {
-          links.push({
-            "source": document,
-            "target": _.findWhere(root.data.documents, {"doc_id": document.doc_id})
-          });
+        var doc_ids;
+        if (typeof(document.doc_id) == typeof([])) {
+          doc_ids = document.doc_id;
+        } else {
+          doc_ids = [document.doc_id];
+        }
+        var i, j, m, n;
+        for (j = 0, m = doc_ids.length; j < m; j++) {
+        // if (root_doc_ids.includes(document.doc_id)) {
+          matched_root_docs = _.where(root.data.documents, {"doc_id": doc_ids[j]});
+          for (i = 0, n = matched_root_docs.length; i < n; i++) {
+            links.push({
+              "source": document,
+              "target": matched_root_docs[i]
+            });
+          }
+        // }
         }
       }
     });
@@ -111,7 +123,7 @@
     g = d3.select("svg").append("g").attr("transform", "translate(80,50)");
 
     var tree = d3.tree()
-      .size([width - 400, height - 700])
+      .size([width - 400, height - 800])
     root = d3.hierarchy(data);
     tree(root);
 
