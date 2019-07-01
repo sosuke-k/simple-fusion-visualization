@@ -6,6 +6,12 @@
   <title>Simple Fusion Visualization using D3(v5)</title>
   <!-- Based on https://wizardace.com/d3-tree/ -->
   <style>
+  body {
+    margin: 0px;
+  }
+  #scroll {
+    overflow: auto;
+  }
   .link {
     fill: none;
     stroke: #555;
@@ -16,41 +22,14 @@
 </head>
 
 <body>
-  <svg width="1200" height="800"></svg>
+  <div id="scrolle">
+    <svg width="1200" height="800"></svg>
+  </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
   var width = document.querySelector("svg").clientWidth;
   var height = document.querySelector("svg").clientHeight;
-
-  // d3.json function used
-  // var data = {
-  //   "name": "F",
-  //   "documents": [
-  //     { "doc_id": "1", "score": "202.0", "rel": 3},
-  //     { "doc_id": "3", "score": "138.0", "rel": 0},
-  //     { "doc_id": "5", "score": "67.0", "rel": 1}
-  //   ],
-  //   "children": [
-  //     {
-  //       "name": "S1",
-  //       "documents": [
-  //         { "doc_id": "1", "score": "63.0", "rel": 3},
-  //         { "doc_id": "2", "score": "40.0", "rel": 0},
-  //         { "doc_id": "3", "score": "39.0", "rel": 0}
-  //       ]
-  //     },
-  //     {
-  //       "name": "S2",
-  //       "documents": [
-  //         { "doc_id": "5", "score": "67.0", "rel": 1},
-  //         { "doc_id": "1", "score": "38.0", "rel": 3},
-  //         { "doc_id": "3", "score": "30.0", "rel": 0}
-  //       ]
-  //     }
-  //   ]
-  // }
-
 
   // Refering https://github.com/d3/d3-hierarchy/blob/master/src/hierarchy/index.js
 
@@ -120,10 +99,52 @@
     const data = await d3.json(jsonPath);
     console.log(data);
 
-    g = d3.select("svg").append("g").attr("transform", "translate(80,50)");
+    var legend = data.legend;
+
+    if (legend != null) {
+      Object.keys(legend).forEach(function (k) {
+        var interval = 30;
+        var r = 8;
+        var s = 7;
+        var x = legend[k].x;
+        var y = legend[k].y;
+        var labels = legend[k].labels;
+        for (var i = 0, n = labels.length; i < n; i++) {
+          var label = labels[i];
+          if (k == "circle") {
+            d3.select("svg").append("circle")
+              .attr("cx", x)
+              .attr("cy", y + interval * i)
+              .attr("r", r)
+              .attr("fill", label.color);
+          } else if (k == "rect") {
+            d3.select("svg").append("rect")
+              .attr("x", x - s)
+              .attr("y", y - s + interval * i)
+              .attr("width", 2 * s)
+              .attr("height", 2 * s)
+              .attr("fill", label.color);
+          } else {
+            console.log(k + " is not supported.")
+            break
+          }
+          d3.select("svg").append("text")
+            .attr("x", x + 13)
+            .attr("y", y + 4 + interval * i)
+            .style("text-anchor", function(d) { return "start"; })
+            .attr("font-size", "100%")
+            .text(label.name);
+        }
+      });
+    }
+
+    var translateX = data.translateX == null ? 0 : data.translateX;
+    var translateY = data.translateY == null ? 50 : data.translateY;
+
+    g = d3.select("svg").append("g").attr("transform", "translate(" + translateX + "," + translateY + ")");
 
     var tree = d3.tree()
-      .size([width - 400, height - 800])
+      .size([width, 0])
     root = d3.hierarchy(data);
     tree(root);
 
@@ -137,13 +158,20 @@
     tops.append("text")
       .attr("dy", 3)
       .attr("x", function(d) { return 12; })
-      .style("text-anchor", function(d) { return "start"; })
+      .style("text-anchor", function(d) { return "middle"; })
       .attr("font-size", "150%")
       .text(function(d) { return d.data.name; });
 
+    tops.append("text")
+      .attr("dy", -30)
+      .attr("x", function(d) { return 12; })
+      .style("text-anchor", function(d) { return "middle"; })
+      .attr("font-size", "100%")
+      .text(function(d) { return d.data.note; });
+
     root.documents(); // before appending path
 
-    var link2 = g.selectAll(".link")
+    var links = g.selectAll(".link")
       .data(root.document_links())
       .enter()
       .append("path")
@@ -165,11 +193,7 @@
 
     documents.append("circle")
       .attr("r", 8)
-      .attr("fill", function(d) {
-        if (d.rel == 3) return "#F00";
-        if (d.rel == 1) return "#900";
-        return "#999";
-      });
+      .attr("fill", function(d) { return d.color; });
 
     documents.append("text")
       .attr("dy", 3)

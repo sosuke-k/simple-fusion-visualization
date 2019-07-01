@@ -1,0 +1,42 @@
+{
+  "name": "F",
+  "note": "Retrieved Documents by",
+  "translateX": 0,
+  "translateY": 150,
+  "documents": [
+    { "doc_id": "1", "score": "202.0", "color": "#E8411C" },
+    { "doc_id": "3", "score": "138.0", "color": "#B0B0B0" },
+    { "doc_id": "4", "score": "67.0", "color": "#730A0B" }
+  ],
+  "children": [
+    {
+      "name": "S1",
+      "note": "Retrieved Documents by",
+      "documents": [
+        { "doc_id": "1", "score": "63.0", "color": "#E8411C" },
+        { "doc_id": "2", "score": "40.0", "color": "#B0B0B0" },
+        { "doc_id": "3", "score": "39.0", "color": "#B0B0B0" }
+      ]
+    },
+    {
+      "name": "S2",
+      "note": "Retrieved Documents by",
+      "documents": [
+        { "doc_id": "4", "score": "67.0", "color": "#730A0B" },
+        { "doc_id": "1", "score": "38.0", "color": "#E8411C" },
+        { "doc_id": "3", "score": "30.0", "color": "#B0B0B0" }
+      ]
+    }
+  ],
+  "legend": {
+    "circle": {
+      "x": 900,
+      "y": 20,
+      "labels": [
+        { "name": "High Rel.", "color": "#E8411C" },
+        { "name": "Rel.", "color": "#730A0B" },
+        { "name": "Not Rel.", "color": "#B0B0B0" }
+      ]
+    }
+  }
+}

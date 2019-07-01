@@ -1,18 +1,3 @@
-# Simple Fusion Visualization
-This visualize a fused list and base lists simple using d3.js
-
-see the following examples.
-
-- [Simple example](https://sosuke-k.github.io/simple-fusion-visualization/index.html?data=data1.json).
-- [Legend example](https://sosuke-k.github.io/simple-fusion-visualization/index.html?data=data2.json).
-
-## How to use
-
-### Prepare data
-
-- You have to prepare a json file like [this](./data1.json).
-
-```
 {
   "name": "F",
   "documents": [
@@ -39,14 +24,3 @@ see the following examples.
     }
   ]
 }
-```
-
-### Clone and Run
-
-```
-git clone https://github.com/sosuke-k/simple-fusion-visualization
-cd simple-fusion-visualization
-python -m http.server 8000 # you don't have to use python
-```
-
-then, open http://localhost:8000/index.html?data= &lt;path to json file&gt; .
