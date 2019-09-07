@@ -1,10 +1,10 @@
 # Simple Fusion Visualization
-This visualize a fused list and base lists simple using d3.js
+This tool visualize a fused list and component lists simply using d3.js
 
-see the following examples.
+see the following demos.
 
-- [Simple example](https://sosuke-k.github.io/simple-fusion-visualization/index.html?data=data1.json).
-- [Legend example](https://sosuke-k.github.io/simple-fusion-visualization/index.html?data=data2.json).
+- [Simple demo](https://sosuke-k.github.io/simple-fusion-visualization/index.html?data=data1.json).
+- [Legend demo](https://sosuke-k.github.io/simple-fusion-visualization/index.html?data=data2.json).
 
 ## How to use
 
